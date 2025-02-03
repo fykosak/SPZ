@@ -12,8 +12,102 @@ class InvalidPointsException(Exception):
 
 class InvalidTaskException(Exception):
     def __init__(self, task, teamId) -> None:
-        super().__init__(
-            f"Invalid task {task} for team {teamId}")
+        super().__init__(f"Invalid task {task} for team {teamId}")
+
+
+class InvalidStudyYearException(Exception):
+    def __init__(self, studyYear) -> None:
+        super().__init__(f"Invalid study year {studyYear}")
+
+
+class Team:
+    def __init__(self, teamId, points, coefficientAverage, category) -> None:
+        self.teamId = teamId
+        self.pointsSum = points['sum']
+        self.pointsCounts = points['counts']
+        self.coefficientAverage = coefficientAverage
+        self.category = category
+
+    def __repr__(self) -> str:
+        return f"<{self.teamId}, {self.category}>"
+
+    def __eq__(self, obj):
+        return self.teamId == obj.teamId
+
+    def __lt__(self, obj):
+        if self.teamId == obj.teamId:
+            return False
+        # compare sum
+        if self.pointsSum > obj.pointsSum:
+            return True
+        if self.pointsSum < obj.pointsSum:
+            return False
+
+        # compare averages -> sum is same, so compare counts
+        if self.getTotalPointsCount() < obj.getTotalPointsCount():
+            return True
+        if self.getTotalPointsCount() > obj.getTotalPointsCount():
+            return False
+
+        # more 5 point submits
+        if self.getPointsCount(5) > obj.getPointsCount(5):
+            return True
+        if self.getPointsCount(5) < obj.getPointsCount(5):
+            return False
+
+        # more 3 point submits
+        if self.getPointsCount(3) > obj.getPointsCount(3):
+            return True
+        if self.getPointsCount(3) < obj.getPointsCount(3):
+            return False
+
+        # lower coefficient
+        if self.coefficientAverage < obj.coefficientAverage:
+            return True
+        if self.coefficientAverage > obj.coefficientAverage:
+            return False
+
+        # lower team id
+        if self.teamId < obj.teamId:
+            return True
+
+        return False
+
+    def getTotalPointsCount(self) -> int:
+        count = 0
+        for points in self.pointsCounts:
+            count += self.pointsCounts[points]
+        return count
+
+    def getPointsCount(self, point):
+        if point in self.pointsCounts:
+            return self.pointsCounts[point]
+        return 0
+
+
+def studyYearToCoefficient(studyYear: str):
+    match studyYear:
+        case 'H_1':
+            return 1
+        case 'H_2':
+            return 2
+        case 'H_3':
+            return 3
+        case 'H_4':
+            return 4
+        case 'U_ALL' | None:
+            raise InvalidStudyYearException(studyYear)
+        case _:
+            return 0
+
+
+def getTeamCoefficientAverage(members) -> float:
+    memberCount = 0
+    coeffSum = 0
+    for member in members:
+        memberCount += 1
+        coeffSum += studyYearToCoefficient(member['studyYear'])
+    return coeffSum/memberCount
 
 
 def appendTeamsData(teamId: int, task: str, points: int, teamTasks: dict) -> None:
@@ -55,8 +149,3 @@ def getTeamPoints(teamTasks: dict) -> dict:
             'counts': pointsCount
         }
     return teamPoints
-
-
-# def orderTeams(teamPoints: dict):
-#    teams = []
-#    for ()

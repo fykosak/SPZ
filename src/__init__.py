@@ -8,7 +8,7 @@ import os
 import json
 import glob
 
-from src.teams import getTeamPoints
+from src.teams import Team, getTeamCoefficientAverage, getTeamPoints
 
 from .lines import parseFile
 
@@ -42,7 +42,7 @@ def process():
         print("Missing JSON data file of teams, please run download first")
         sys.exit()
     with open(TEAM_JSON, 'r') as jsonFile:
-        teams = json.load(jsonFile)
+        teamsJsonData = json.load(jsonFile)
 
     # load in files
     if not os.path.exists(IN_DIR):
@@ -56,7 +56,7 @@ def process():
     print(inputFiles)
 
     if (len(inputFiles) == 0):
-        print("No input files found")
+        print("No input file found")
         sys.exit()
 
     teamTasks = {}
@@ -65,7 +65,20 @@ def process():
     print(teamTasks)
 
     teamPoints = getTeamPoints(teamTasks)
-    print(teamPoints)
+
+    teams = []
+    for teamId in teamPoints:
+        coeffAvg = getTeamCoefficientAverage(
+            teamsJsonData[str(teamId)]['members'])
+        teams.append(Team(
+            teamId,
+            teamPoints[teamId],
+            coeffAvg,
+            teamsJsonData[str(teamId)]['category']
+        ))
+
+    teams.sort()
+    print(teams)
 
 
 def main():

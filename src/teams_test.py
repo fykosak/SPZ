@@ -1,6 +1,7 @@
 import pytest
+import random
 
-from src.teams import DuplicatePointsEntryException, InvalidPointsException, InvalidTaskException, appendTeamsData, getTeamPoints
+from src.teams import DuplicatePointsEntryException, InvalidPointsException, InvalidTaskException, Team, appendTeamsData, getTeamPoints
 
 
 def test_simple():
@@ -107,3 +108,49 @@ def test_points_sum():
             }
         }
     }
+
+
+def get_test_teams():
+    return [
+        Team(8, {'sum': 15, 'counts': {5: 3}}, 4, 'A'),
+        Team(2, {'sum': 8, 'counts': {5: 1, 3: 1}}, 4, 'B'),
+        Team(1, {'sum': 8, 'counts': {5: 1, 2: 1, 1: 1}}, 4, 'A'),
+        Team(4, {'sum': 8, 'counts': {3: 2, 2: 1}}, 4, 'B'),
+        Team(3, {'sum': 4, 'counts': {3: 1, 1: 1}}, 4, 'A'),
+        Team(7, {'sum': 4, 'counts': {2: 2}}, 1, 'A'),
+        Team(5, {'sum': 4, 'counts': {2: 2}}, 4, 'B'),
+        Team(6, {'sum': 4, 'counts': {2: 2}}, 4, 'A')
+    ]
+
+
+def test_team_compare_gt():
+    teams = get_test_teams()
+    for i in range(0, 7):
+        assert not teams[i] < teams[i]
+        assert not teams[i] > teams[i]
+        for j in range(i+1, 7+1):
+            assert teams[i] < teams[j]
+            assert not (teams[i] > teams[j])
+
+
+def test_team_sort():
+    teams = [
+        Team(8, {'sum': 15, 'counts': {5: 3}}, 4, 'A'),
+        Team(2, {'sum': 8, 'counts': {5: 1, 3: 1}}, 4, 'B'),
+        Team(1, {'sum': 8, 'counts': {5: 1, 2: 1, 1: 1}}, 4, 'A'),
+        Team(4, {'sum': 8, 'counts': {3: 2, 2: 1}}, 4, 'B'),
+        Team(3, {'sum': 4, 'counts': {3: 1, 1: 1}}, 4, 'A'),
+        Team(7, {'sum': 4, 'counts': {2: 2}}, 1, 'A'),
+        Team(5, {'sum': 4, 'counts': {2: 2}}, 4, 'B'),
+        Team(6, {'sum': 4, 'counts': {2: 2}}, 4, 'A')
+    ]
+    sorted(teams, key=lambda team: team.teamId)
+    print(teams)
+    assert teams[0].teamId == 8
+    assert teams[1].teamId == 2
+    assert teams[2].teamId == 1
+    assert teams[3].teamId == 4
+    assert teams[4].teamId == 3
+    assert teams[5].teamId == 7
+    assert teams[6].teamId == 5
+    assert teams[7].teamId == 6
