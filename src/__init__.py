@@ -8,6 +8,8 @@ import os
 import json
 import glob
 
+from src.teams import getTeamPoints
+
 from .lines import parseFile
 
 TEAM_JSON = 'teams.json'
@@ -57,9 +59,13 @@ def process():
         print("No input files found")
         sys.exit()
 
-    tasks = {}
+    teamTasks = {}
     for inputFile in inputFiles:
-        parseFile(inputFile, tasks)
+        parseFile(inputFile, teamTasks)
+    print(teamTasks)
+
+    teamPoints = getTeamPoints(teamTasks)
+    print(teamPoints)
 
 
 def main():

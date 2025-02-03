@@ -23,3 +23,8 @@ CSV musí být ve formátu `kód;body`, tedy například `001234AA7;5`. Preferov
 oddělovačem je středník, lze ale použít libovolně i čárky, mezery nebo
 tabulátory. Uvozovky jsou ignorovány. Více oddělovačů za sebou je složených do
 jednoho.
+
+### Testování
+Pro spuštění testů stačí spustit `pytest`. Pro vytvoření statistik o podchycení
+lze využít `coverage run -m pytest` a následně `coverage report` pro vypsání
+nebo `coverage html` pro vygenerování html.

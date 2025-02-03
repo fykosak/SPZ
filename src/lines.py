@@ -1,5 +1,6 @@
 import re
 
+from .teams import appendTeamsData
 from .code import extractCodeData
 
 
@@ -26,15 +27,13 @@ def splitLine(line: str):
 def extractLineData(line: str):
     line = line.strip()
     split = splitLine(line)
-    if split is None:
-        return None
     (code, points) = split
-    print(f"Code: {code}")
-    print(f"Points: {points}")
-    extractCodeData(code)
+    (teamId, task) = extractCodeData(code)
+    return (teamId, task, int(points))
 
 
-def parseFile(inputFile, tasks):
+def parseFile(inputFile: str, teamTasks: dict):
     with open(inputFile, 'r') as file:
         for line in file:
-            extractLineData(line)
+            (teamId, task, points) = extractLineData(line)
+            appendTeamsData(teamId, task, points, teamTasks)
