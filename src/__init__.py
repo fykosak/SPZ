@@ -36,6 +36,19 @@ def download():
     print("Download complete")
 
 
+def printTeamTable(teams):
+    titleString = f"│ N │{"Nátev týmu":32}│{"ID":^5}│Kat.│Body│Poř. glob.|Poř. v kat.|"
+    print("—"*len(titleString))
+    print(titleString)
+    print("—"*len(titleString))
+    for i in range(len(teams)):
+        team = teams[i]
+        print(
+            f"│{i+1:>3}│{team.name:<32}│{team.teamId:>5}│{team.category:^4}│{team.pointsSum:>4}│{team.rankTotal:>10}│{team.rankCategory:>11}│"
+        )
+    print("—"*len(titleString))
+
+
 def process():
     # load teams
     if not os.path.exists(TEAM_JSON):
@@ -53,7 +66,6 @@ def process():
         sys.exit()
 
     inputFiles = glob.glob(IN_DIR + "/*.csv")
-    print(inputFiles)
 
     if (len(inputFiles) == 0):
         print("No input file found")
@@ -62,7 +74,6 @@ def process():
     teamTasks = {}
     for inputFile in inputFiles:
         parseFile(inputFile, teamTasks)
-    print(teamTasks)
 
     teamPoints = getTeamPoints(teamTasks)
 
@@ -72,13 +83,71 @@ def process():
             teamsJsonData[str(teamId)]['members'])
         teams.append(Team(
             teamId,
+            teamsJsonData[str(teamId)]['name'],
             teamPoints[teamId],
             coeffAvg,
             teamsJsonData[str(teamId)]['category']
         ))
 
+    # rank teams
+    teamsA = sorted([team for team in teams.copy() if team.category == 'A'])
+    teamsB = sorted([team for team in teams.copy() if team.category == 'B'])
+    teamsC = sorted([team for team in teams.copy() if team.category == 'C'])
     teams.sort()
-    print(teams)
+
+    # save team ranks
+    for i in range(len(teams)):
+        teams[i].rankTotal = i+1
+    for group in [teamsA, teamsB, teamsC]:
+        for i in range(len(group)):
+            group[i].rankCategory = i+1
+
+    # update original JSON data
+    for team in teams:
+        teamsJsonData[str(team.teamId)]['rankTotal'] = team.rankTotal
+        teamsJsonData[str(team.teamId)]['rankCategory'] = team.rankCategory
+        teamsJsonData[str(team.teamId)]['points'] = team.pointsSum
+        teamsJsonData[str(team.teamId)]['state'] = 'participated'
+
+    with open('teams-calculated.json', 'w') as file:
+        json.dump(teamsJsonData, file)
+
+    # print results
+    print("\nTýmy seřazeny dle pořadí\n")
+    print("Globální pořadí")
+    printTeamTable(teams)
+    print()
+    print("Kategorie A")
+    printTeamTable(teamsA)
+    print()
+    print("Kategorie B")
+    printTeamTable(teamsB)
+    print()
+    print("Kategorie C")
+    printTeamTable(teamsC)
+
+    # print sorted by team name
+    teamsByName = teams.copy()
+    teamsByNameA = teamsA.copy()
+    teamsByNameB = teamsB.copy()
+    teamsByNameC = teamsC.copy()
+    sorted(teamsByName, key=lambda team: team.name)
+    sorted(teamsByNameA, key=lambda team: team.name)
+    sorted(teamsByNameB, key=lambda team: team.name)
+    sorted(teamsByNameC, key=lambda team: team.name)
+
+    print("\nTýmy seřazeny dle názvu\n")
+    print("Všechny týmy")
+    printTeamTable(teams)
+    print()
+    print("Kategorie A")
+    printTeamTable(teamsA)
+    print()
+    print("Kategorie B")
+    printTeamTable(teamsB)
+    print()
+    print("Kategorie C")
+    printTeamTable(teamsC)
 
 
 def main():
