@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from src.teams import DuplicatePointsEntryException, InvalidPointsException, InvalidTaskException, Team, appendTeamsData, getTeamPoints
+from src.teams import DuplicatePointsEntryException, InvalidPointsException, InvalidStudyYearException, InvalidTaskException, Team, appendTeamsData, getTeamCoefficientAverage, getTeamPoints, studyYearToCoefficient
 
 
 def test_simple():
@@ -123,6 +123,12 @@ def get_test_teams():
     ]
 
 
+def test_team_compare_eq():
+    teams = get_test_teams()
+    for i in range(0, len(teams)):
+        assert teams[i] == teams[i]
+
+
 def test_team_compare_gt():
     teams = get_test_teams()
     for i in range(0, 7):
@@ -154,3 +160,35 @@ def test_team_sort():
     assert teams[5].teamId == 7
     assert teams[6].teamId == 5
     assert teams[7].teamId == 6
+
+
+def test_study_year_to_coefficient():
+    assert studyYearToCoefficient('H_1') == 1
+    assert studyYearToCoefficient('H_2') == 2
+    assert studyYearToCoefficient('H_3') == 3
+    assert studyYearToCoefficient('H_4') == 4
+    assert studyYearToCoefficient('P_9') == 0
+    assert studyYearToCoefficient('P_8') == 0
+    assert studyYearToCoefficient('P_7') == 0
+    assert studyYearToCoefficient('P_6') == 0
+    assert studyYearToCoefficient('P_5') == 0
+    with pytest.raises(InvalidStudyYearException):
+        studyYearToCoefficient('U_ALL')
+    with pytest.raises(InvalidStudyYearException):
+        studyYearToCoefficient(None)
+
+
+def test_team_coefficient_average():
+    assert getTeamCoefficientAverage([{'studyYear': 'H_1'}]) == 1
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'H_2'}, {'studyYear': 'H_3'}]
+    ) == 2.5
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'H_1'}, {'studyYear': 'H_2'}, {'studyYear': 'H_3'}]
+    ) == 2
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'H_1'}, {'studyYear': 'H_3'}, {'studyYear': 'H_3'}]
+    ) == 7/3
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'P_9'}, {'studyYear': 'H_4'}]
+    ) == 2
