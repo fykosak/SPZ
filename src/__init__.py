@@ -48,7 +48,7 @@ def get_teams(eventId, username, password):
 
 
 def printTeamTable(teams):
-    titleString = f"│ N │{"Nátev týmu":32}│{"ID":^5}│Kat.│Body│Poř. glob.|Poř. v kat.|"
+    titleString = "│ N │{:32}│{:^5}│Kat.│Body│Poř. glob.|Poř. v kat.|".format("Název týmu", "ID")
     print("—"*len(titleString))
     print(titleString)
     print("—"*len(titleString))
