@@ -7,6 +7,7 @@ import argparse
 import os
 import json
 import glob
+import base64
 
 from src.teams import Team, getTeamCoefficientAverage, getTeamPoints
 
@@ -23,10 +24,7 @@ def download():
 
     print(f"Downloading teams data for event {eventId}")
 
-    req = requests.get(
-        f'https://db.fykos.cz/api/events/{eventId}/teams',
-        auth=(username, password)
-    )
+    req = get_teams(eventId, username, password)
 
     print("Saving")
 
@@ -35,9 +33,22 @@ def download():
 
     print("Download complete")
 
+def get_teams(eventId, username, password):
+    credentials = f"{username}:{password}".encode("utf-8")
+    encoded_credentials = base64.b64encode(credentials).decode("utf-8")
+    headers = {
+        "Authorization": f"Basic {encoded_credentials}"
+    }
+
+    req = requests.get(
+        f'https://db.fykos.cz/api/events/{eventId}/teams',
+        headers=headers
+    )
+    return req
+
 
 def printTeamTable(teams):
-    titleString = f"│ N │{"Nátev týmu":32}│{"ID":^5}│Kat.│Body│Poř. glob.|Poř. v kat.|"
+    titleString = "│ N │{:32}│{:^5}│Kat.│Body│Poř. glob.|Poř. v kat.|".format("Název týmu", "ID")
     print("—"*len(titleString))
     print(titleString)
     print("—"*len(titleString))

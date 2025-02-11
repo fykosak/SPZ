@@ -10,7 +10,7 @@ kterém jsou data o týmech uloženy.
 > [!WARNING]
 > Data musí být stažena předtím, než spadne FKSDB, jinak se k datům nepůjde
 > dostat. Pro je vhodné stáhnout data dopředu a pokud to situace umožní, tak
-> je na soutěží jen aktualizovat.
+> je na soutěži jen aktualizovat.
 
 ### Spuštění
 Script najde všechny `.csv` soubory ve složce `in`. Pokud není v této složce
