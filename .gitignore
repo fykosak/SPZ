@@ -1,4 +1,8 @@
 **/__pycache__
 .pytest_cache
-teams.json
+.coverage
+htmlcov
+
 in/*.csv
+teams.json
+teams-calculated.json

@@ -39,7 +39,5 @@ def extractCodeData(code: str):
 
     teamId = int(code[0:5+1])
     task = code[6:7+1]
-    controlDigit = code[8]
-    print(teamId, task, controlDigit)
     verifyCode(code)
     return (teamId, task)

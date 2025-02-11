@@ -21,12 +21,15 @@ class InvalidStudyYearException(Exception):
 
 
 class Team:
-    def __init__(self, teamId, points, coefficientAverage, category) -> None:
+    def __init__(self, teamId, name, points, coefficientAverage, category) -> None:
         self.teamId = teamId
+        self.name = name
         self.pointsSum = points['sum']
         self.pointsCounts = points['counts']
         self.coefficientAverage = coefficientAverage
         self.category = category
+        self.rankCategory = 0
+        self.rankTotal = 0
 
     def __repr__(self) -> str:
         return f"<{self.teamId}, {self.category}>"

@@ -1,7 +1,7 @@
 import pytest
 import random
 
-from src.teams import DuplicatePointsEntryException, InvalidPointsException, InvalidTaskException, Team, appendTeamsData, getTeamPoints
+from src.teams import DuplicatePointsEntryException, InvalidPointsException, InvalidStudyYearException, InvalidTaskException, Team, appendTeamsData, getTeamCoefficientAverage, getTeamPoints, studyYearToCoefficient
 
 
 def test_simple():
@@ -112,15 +112,21 @@ def test_points_sum():
 
 def get_test_teams():
     return [
-        Team(8, {'sum': 15, 'counts': {5: 3}}, 4, 'A'),
-        Team(2, {'sum': 8, 'counts': {5: 1, 3: 1}}, 4, 'B'),
-        Team(1, {'sum': 8, 'counts': {5: 1, 2: 1, 1: 1}}, 4, 'A'),
-        Team(4, {'sum': 8, 'counts': {3: 2, 2: 1}}, 4, 'B'),
-        Team(3, {'sum': 4, 'counts': {3: 1, 1: 1}}, 4, 'A'),
-        Team(7, {'sum': 4, 'counts': {2: 2}}, 1, 'A'),
-        Team(5, {'sum': 4, 'counts': {2: 2}}, 4, 'B'),
-        Team(6, {'sum': 4, 'counts': {2: 2}}, 4, 'A')
+        Team(8, 'A', {'sum': 15, 'counts': {5: 3}}, 4, 'A'),
+        Team(2, 'A', {'sum': 8, 'counts': {5: 1, 3: 1}}, 4, 'B'),
+        Team(1, 'A', {'sum': 8, 'counts': {5: 1, 2: 1, 1: 1}}, 4, 'A'),
+        Team(4, 'A', {'sum': 8, 'counts': {3: 2, 2: 1}}, 4, 'B'),
+        Team(3, 'A', {'sum': 4, 'counts': {3: 1, 1: 1}}, 4, 'A'),
+        Team(7, 'A', {'sum': 4, 'counts': {2: 2}}, 1, 'A'),
+        Team(5, 'A', {'sum': 4, 'counts': {2: 2}}, 4, 'B'),
+        Team(6, 'A', {'sum': 4, 'counts': {2: 2}}, 4, 'A')
     ]
+
+
+def test_team_compare_eq():
+    teams = get_test_teams()
+    for i in range(0, len(teams)):
+        assert teams[i] == teams[i]
 
 
 def test_team_compare_gt():
@@ -134,16 +140,7 @@ def test_team_compare_gt():
 
 
 def test_team_sort():
-    teams = [
-        Team(8, {'sum': 15, 'counts': {5: 3}}, 4, 'A'),
-        Team(2, {'sum': 8, 'counts': {5: 1, 3: 1}}, 4, 'B'),
-        Team(1, {'sum': 8, 'counts': {5: 1, 2: 1, 1: 1}}, 4, 'A'),
-        Team(4, {'sum': 8, 'counts': {3: 2, 2: 1}}, 4, 'B'),
-        Team(3, {'sum': 4, 'counts': {3: 1, 1: 1}}, 4, 'A'),
-        Team(7, {'sum': 4, 'counts': {2: 2}}, 1, 'A'),
-        Team(5, {'sum': 4, 'counts': {2: 2}}, 4, 'B'),
-        Team(6, {'sum': 4, 'counts': {2: 2}}, 4, 'A')
-    ]
+    teams = get_test_teams()
     sorted(teams, key=lambda team: team.teamId)
     print(teams)
     assert teams[0].teamId == 8
@@ -154,3 +151,35 @@ def test_team_sort():
     assert teams[5].teamId == 7
     assert teams[6].teamId == 5
     assert teams[7].teamId == 6
+
+
+def test_study_year_to_coefficient():
+    assert studyYearToCoefficient('H_1') == 1
+    assert studyYearToCoefficient('H_2') == 2
+    assert studyYearToCoefficient('H_3') == 3
+    assert studyYearToCoefficient('H_4') == 4
+    assert studyYearToCoefficient('P_9') == 0
+    assert studyYearToCoefficient('P_8') == 0
+    assert studyYearToCoefficient('P_7') == 0
+    assert studyYearToCoefficient('P_6') == 0
+    assert studyYearToCoefficient('P_5') == 0
+    with pytest.raises(InvalidStudyYearException):
+        studyYearToCoefficient('U_ALL')
+    with pytest.raises(InvalidStudyYearException):
+        studyYearToCoefficient(None)
+
+
+def test_team_coefficient_average():
+    assert getTeamCoefficientAverage([{'studyYear': 'H_1'}]) == 1
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'H_2'}, {'studyYear': 'H_3'}]
+    ) == 2.5
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'H_1'}, {'studyYear': 'H_2'}, {'studyYear': 'H_3'}]
+    ) == 2
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'H_1'}, {'studyYear': 'H_3'}, {'studyYear': 'H_3'}]
+    ) == 7/3
+    assert getTeamCoefficientAverage(
+        [{'studyYear': 'P_9'}, {'studyYear': 'H_4'}]
+    ) == 2
