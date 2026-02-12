@@ -37,7 +37,7 @@ def download():
 
 
 def printTeamTable(teams):
-    titleString = f"│ N │{"Nátev týmu":32}│{"ID":^5}│Kat.│Body│Poř. glob.|Poř. v kat.|"
+    titleString = f"│ N │{"Název týmu":32}│{"ID":^5}│Kat.│Body│Poř. glob.|Poř. v kat.|"
     print("—"*len(titleString))
     print(titleString)
     print("—"*len(titleString))
@@ -131,23 +131,23 @@ def process():
     teamsByNameA = teamsA.copy()
     teamsByNameB = teamsB.copy()
     teamsByNameC = teamsC.copy()
-    sorted(teamsByName, key=lambda team: team.name)
-    sorted(teamsByNameA, key=lambda team: team.name)
-    sorted(teamsByNameB, key=lambda team: team.name)
-    sorted(teamsByNameC, key=lambda team: team.name)
+    teamsByName.sort(key=lambda team: team.name)
+    teamsByNameA.sort(key=lambda team: team.name)
+    teamsByNameB.sort(key=lambda team: team.name)
+    teamsByNameC.sort(key=lambda team: team.name)
 
     print("\nTýmy seřazeny dle názvu\n")
     print("Všechny týmy")
-    printTeamTable(teams)
+    printTeamTable(teamsByName)
     print()
     print("Kategorie A")
-    printTeamTable(teamsA)
+    printTeamTable(teamsByNameA)
     print()
     print("Kategorie B")
-    printTeamTable(teamsB)
+    printTeamTable(teamsByNameB)
     print()
     print("Kategorie C")
-    printTeamTable(teamsC)
+    printTeamTable(teamsByNameC)
 
 
 def main():
